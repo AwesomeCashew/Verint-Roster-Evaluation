@@ -8,12 +8,60 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = F, message = F, fig.align = 'center')
 
-pacman::p_load(tidyverse, skimr, tidymodels)
+pacman::p_load(tidyverse, skimr, tidymodels, lubridate)
 ```
-
 
 ### Data Import
+
 ```{r}
-# Importing data...
+Verint_Extract <- read_delim("Verint Extract.txt", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE) %>% 
+  as_tibble()
 ```
 
+### Clean Data
+
+```{r}
+clean_extract <- Verint_Extract %>% 
+  janitor::clean_names() %>% 
+  filter(shift_assignment != "Off" & !is.na(shift_assignment))
+```
+
+```{r leave_types, include=FALSE}
+leave_types <- c("AU Leave","AU PARNT","AU Sick with cert","AU FACL","AU Sick no cert")
+```
+
+```{r functions, include=FALSE}
+parse_time <- function(string, index=1, pattern="\\d{1,2}:\\d{2}"){
+  return(str_pad(map_chr(str_extract_all(string, pattern), ~.[index]), 5, pad = "0"))
+}
+```
+
+```{r}
+scheduling_period <- clean_extract[1, "scheduling_period"]
+
+roster <- clean_extract %>% 
+  select(-scheduling_period, -before_overtime, -after_overtime) %>% 
+  mutate(
+    activity = str_extract(shift_assignment, "[\\w\\s]+"),
+    date = dmy(str_extract(shift_assignment, "\\d{2}/\\d{2}/\\d{4}")),
+    start_time = parse_time(shift_assignment),
+    finish_time = parse_time(shift_assignment, 2)
+  )
+
+head(roster)
+```
+
+```{r}
+roster %>% 
+  separate_rows(shift_events, sep = ";") %>% 
+  mutate(
+    se_activity = str_extract(shift_events, "[\\w\\s]+"),
+    se_start = dmy_hm(str_extract(shift_events, "\\d{2}/\\d{2}/\\d{4} \\d{1,2}:\\d{2}")),
+    se_finish = dmy_hm(parse_time(shift_events, 2, "\\d{2}/\\d{2}/\\d{4} \\d{1,2}:\\d{2}")),
+    on_leave = case_when(se_activity %in% leave_types ~ 1,
+                         TRUE ~ 0)
+  ) %>% 
+  drop_na()
+```
