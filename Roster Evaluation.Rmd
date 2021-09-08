@@ -54,14 +54,14 @@ head(roster)
 ```
 
 ```{r}
-roster %>% 
-  separate_rows(shift_events, sep = ";") %>% 
-  mutate(
-    se_activity = str_extract(shift_events, "[\\w\\s]+"),
-    se_start = dmy_hm(str_extract(shift_events, "\\d{2}/\\d{2}/\\d{4} \\d{1,2}:\\d{2}")),
-    se_finish = dmy_hm(parse_time(shift_events, 2, "\\d{2}/\\d{2}/\\d{4} \\d{1,2}:\\d{2}")),
-    on_leave = case_when(se_activity %in% leave_types ~ 1,
-                         TRUE ~ 0)
-  ) %>% 
-  drop_na()
+# roster %>% 
+#   separate_rows(shift_events, sep = ";") %>% 
+#   mutate(
+#     se_activity = str_extract(shift_events, "[\\w\\s]+"),
+#     se_start = dmy_hm(str_extract(shift_events, "\\d{2}/\\d{2}/\\d{4} \\d{1,2}:\\d{2}")),
+#     se_finish = dmy_hm(parse_time(shift_events, 2, "\\d{2}/\\d{2}/\\d{4} \\d{1,2}:\\d{2}")),
+#     on_leave = case_when(se_activity %in% leave_types ~ 1,
+#                          TRUE ~ 0)
+#   ) %>% 
+#   drop_na()
 ```
