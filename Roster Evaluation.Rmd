@@ -67,12 +67,8 @@ head(roster)
 #   drop_na()
 ```
 
-```{python helper_function}
-
+```{r}
+start_date_of_period = min(roster$date)
+start_time = min(roster$start_time)
+finish_time = max(roster$finish_time)
 ```
-
-```{python shift_event_parsing}
-r.roster.loc[1,]
-```
-
-changes
