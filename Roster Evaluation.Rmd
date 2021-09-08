@@ -71,6 +71,6 @@ head(roster)
 
 ```
 
-```{python}
+```{python shift_event_parsing}
 r.roster.loc[1,]
 ```
