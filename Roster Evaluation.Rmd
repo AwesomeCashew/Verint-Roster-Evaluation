@@ -48,7 +48,8 @@ roster <- clean_extract %>%
     date = dmy(str_extract(shift_assignment, "\\d{2}/\\d{2}/\\d{4}")),
     start_time = parse_time(shift_assignment),
     finish_time = parse_time(shift_assignment, 2)
-  )
+  ) %>% 
+  select(-shift_assignment)
 
 head(roster)
 ```
@@ -64,4 +65,12 @@ head(roster)
 #                          TRUE ~ 0)
 #   ) %>% 
 #   drop_na()
+```
+
+```{python helper_function}
+
+```
+
+```{python}
+r.roster.loc[1,]
 ```
